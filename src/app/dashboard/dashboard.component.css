@@ -1,0 +1,90 @@
+/* คอนเทนเนอร์หลัก */
+.container-fluid {
+    background-color: #f8f9fc;
+    min-height: 100vh;
+}
+
+/* หัวข้อ Dashboard */
+h1.h3 {
+    color: #4e73df;
+    font-weight: 700;
+}
+
+/* --- ส่วนของ Card สรุปผล --- */
+.card {
+    border: none;
+    border-radius: 0.75rem;
+    transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.shadow-sm {
+    box-shadow: 0 .125rem .25rem 0 rgba(58, 59, 69, .05)!important;
+}
+
+/* แถบสีข้าง Card */
+.border-left-primary {
+    border-left: 0.25rem solid #4e73df !important;
+}
+
+.border-left-danger {
+    border-left: 0.25rem solid #e74a3b !important;
+}
+
+.text-xs {
+    font-size: .7rem;
+    letter-spacing: .1rem;
+}
+
+/* --- ส่วนของตาราง --- */
+.table-responsive {
+    border-radius: 0.75rem;
+    overflow: hidden;
+}
+
+.table thead th {
+    background-color: #f1f3f9;
+    color: #4e73df;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    font-weight: 800;
+    padding: 1rem;
+    border: none;
+}
+
+.table tbody td {
+    padding: 1rem;
+    vertical-align: middle;
+    border-bottom: 1px solid #f1f1f1;
+}
+
+.table-hover tbody tr:hover {
+    background-color: #f8f9ff;
+    cursor: pointer;
+}
+
+/* --- ส่วนของ Badge (สถานะ) --- */
+.badge {
+    padding: 0.5em 0.8em;
+    font-weight: 600;
+    font-size: 0.75rem;
+}
+
+.rounded-pill {
+    border-radius: 50rem !important;
+}
+
+/* --- Loading Spinner --- */
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* ตกแต่ง Avatar ชื่อผู้ส่งรายงาน */
+.avatar-sm {
+    font-weight: bold;
+    color: white;
+}

@@ -1,0 +1,135 @@
+<div class="container-fluid py-4 bg-light min-vh-100">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0 text-gray-800 fw-bold">📦 GoodReceive Damaged Dashboard</h1>
+    <button class="btn btn-primary shadow-sm" (click)="fetchData()" [disabled]="isLoading">
+      @if (isLoading) {
+        <span class="spinner-border spinner-border-sm me-1"></span>
+      } @else {
+        <i class="bi bi-arrow-clockwise"></i>
+      }
+      Refresh Data
+    </button>
+  </div>
+
+  @if (isLoading) {
+    <div class="d-flex flex-column justify-content-center align-items-center" style="height: 60vh;">
+      <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status"></div>
+      <h5 class="mt-3 text-muted">กำลังดึงข้อมูลล่าสุดจากระบบ...</h5>
+    </div>
+  } @else {
+    <div class="row mb-4">
+      <div class="col-md-4 mb-3">
+        <div class="card border-0 border-start border-primary border-4 shadow-sm h-100 py-2">
+          <div class="card-body">
+            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Issues</div>
+            <div class="h4 mb-0 font-weight-bold text-dark">{{ totalIssues | number }} Cases</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-3">
+        <div class="card border-0 border-start border-danger border-4 shadow-sm h-100 py-2">
+          <div class="card-body">
+            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Total Damaged Qty</div>
+            <div class="h4 mb-0 font-weight-bold text-dark">{{ totalQty | number }} Units</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card shadow-sm border-0 mb-4">
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-8">
+            <label class="form-label small fw-bold text-muted">Search ASN No.</label>
+            <div class="input-group">
+              <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+              <input type="text" class="form-control border-start-0" 
+                     placeholder="Type ASN number to search..." 
+                     [(ngModel)]="searchTerm" (input)="applyFilter()">
+            </div>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label small fw-bold text-muted">Filter Issue Type</label>
+            <select class="form-select" [(ngModel)]="filterType" (change)="applyFilter()">
+              <option value="">All Types</option>
+              <option value="กล่องบุบ">กล่องบุบ</option>
+              <option value="กล่องเป็นรอย">กล่องเป็นรอย</option>
+              <option value="กล่องขาด">กล่องขาด</option>
+              <option value="เสื้อเปื้อน">เสื้อเปื้อน</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card shadow-sm border-0">
+      <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <h6 class="m-0 font-weight-bold text-primary">Detailed Damaged Logs</h6>
+        <button class="btn btn-sm btn-outline-success shadow-sm" (click)="exportToExcel()">
+          <i class="bi bi-file-earmark-excel"></i> Export Excel
+        </button>
+      </div>
+      
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light text-secondary">
+              <tr>
+                <th class="ps-3">Date</th>
+                <th>ASN / PO</th>
+                <th>Item Information</th>
+                <th>Carton No.</th>
+                <th>Issue Type</th>
+                <th class="text-center">Qty</th>
+                <th>Reporter</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of filteredBoxes; track item.id) {
+                <tr>
+                  <td class="ps-3">
+                    <div class="fw-bold">{{ item.created_at | date:'dd MMM yyyy' }}</div>
+                    <small class="text-muted">{{ item.created_at | date:'HH:mm' }}</small>
+                  </td>
+                  <td>
+                    <span class="badge bg-light text-dark border">{{ item.asn_no }}</span>
+                    <div class="small text-muted mt-1">{{ item.ref_po_doc }}</div>
+                  </td>
+                  <td>
+                    <div class="fw-bold text-primary">{{ item.item_sku }}</div>
+                    <code class="small text-muted">{{ item.barcode }}</code>
+                  </td>
+                  <td>{{ item.carton_no }}</td>
+                  <td>
+                    <span [class]="getIssueClass(item.issue_type)">
+                      {{ item.issue_type }}
+                    </span>
+                  </td>
+                  <td class="text-center">
+                    <span class="h6 mb-0 fw-bold">{{ item.qty }}</span>
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div class="avatar-sm bg-secondary text-white rounded-circle me-2 d-flex justify-content-center align-items-center" 
+                           style="width: 28px; height: 28px; font-size: 11px;">
+                        {{ item.saved_by.substring(0,1).toUpperCase() }}
+                      </div>
+                      <span class="small">{{ item.saved_by }}</span>
+                    </div>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="7" class="text-center py-5">
+                    <i class="bi bi-inbox text-muted display-4"></i>
+                    <p class="mt-2 text-muted">ไม่พบข้อมูลที่ตรงกับเงื่อนไขการค้นหา</p>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  }
+</div>
