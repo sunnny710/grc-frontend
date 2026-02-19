@@ -1,14 +1,22 @@
 <div class="container-fluid py-4 bg-light min-vh-100">
-  <div class="d-flex justify-content-between align-items-center mb-4">
+  <div class="d-flex justify-content-between align-items-start mb-4">
     <h1 class="h3 mb-0 text-gray-800 fw-bold">📦 GoodReceive Damaged Dashboard</h1>
-    <button class="btn btn-primary shadow-sm" (click)="fetchData()" [disabled]="isLoading">
-      @if (isLoading) {
-        <span class="spinner-border spinner-border-sm me-1"></span>
-      } @else {
-        <i class="bi bi-arrow-clockwise"></i>
-      }
-      Refresh Data
-    </button>
+
+    <div class="d-flex flex-column align-items-end">
+      <button class="btn btn-primary shadow-sm d-flex align-items-center mb-2" (click)="fetchData()" [disabled]="isLoading">
+        @if (isLoading) {
+          <span class="spinner-border spinner-border-sm me-2"></span>
+        } @else {
+          <i class="bi bi-arrow-clockwise me-2"></i>
+        }
+        Refresh Data
+      </button>
+
+      <span class="badge rounded-pill bg-white text-muted border fw-normal py-1 px-3 shadow-sm" style="font-size: 0.75rem;">
+        <i class="bi bi-clock-history me-1 text-primary"></i> 
+        ระบบอัปเดตข้อมูลอัตโนมัติทุก 1 นาที
+      </span>
+    </div>
   </div>
 
   @if (isLoading) {
@@ -17,46 +25,79 @@
       <h5 class="mt-3 text-muted">กำลังดึงข้อมูลล่าสุดจากระบบ...</h5>
     </div>
   } @else {
-    <div class="row mb-4">
-      <div class="col-md-4 mb-3">
+    
+    <div class="row mb-3">
+      <div class="col-md-6 mb-3">
         <div class="card border-0 border-start border-primary border-4 shadow-sm h-100 py-2">
           <div class="card-body">
-            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Issues</div>
-            <div class="h4 mb-0 font-weight-bold text-dark">{{ totalIssues | number }} Cases</div>
+            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Issues (All)</div>
+            <div class="h4 mb-0 font-weight-bold text-dark">{{ damagedBoxes.length | number }} Cases</div>
           </div>
         </div>
       </div>
-      <div class="col-md-4 mb-3">
+      <div class="col-md-6 mb-3">
         <div class="card border-0 border-start border-danger border-4 shadow-sm h-100 py-2">
           <div class="card-body">
-            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Total Damaged Qty</div>
+            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Total Damaged Qty (All)</div>
             <div class="h4 mb-0 font-weight-bold text-dark">{{ totalQty | number }} Units</div>
           </div>
         </div>
       </div>
     </div>
 
+    <div class="row mb-4">
+      <div class="col-md-3 mb-3" (click)="selectFilterType('กล่องบุบ')" style="cursor: pointer;">
+        <div class="card border-0 border-start border-danger border-4 shadow-sm h-100 py-2" [class.bg-danger-subtle]="filterType === 'กล่องบุบ'">
+          <div class="card-body text-center">
+            <div class="small fw-bold text-danger mb-1">กล่องบุบ</div>
+            <div class="h5 mb-0 fw-bold text-dark">{{ getCountByType('กล่องบุบ') }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3 mb-3" (click)="selectFilterType('กล่องเป็นรอย')" style="cursor: pointer;">
+        <div class="card border-0 border-start border-warning border-4 shadow-sm h-100 py-2" [class.bg-warning-subtle]="filterType === 'กล่องเป็นรอย'">
+          <div class="card-body text-center">
+            <div class="small fw-bold text-warning mb-1">กล่องเป็นรอย</div>
+            <div class="h5 mb-0 fw-bold text-dark">{{ getCountByType('กล่องเป็นรอย') }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3 mb-3" (click)="selectFilterType('กล่องขาด')" style="cursor: pointer;">
+        <div class="card border-0 border-start border-dark border-4 shadow-sm h-100 py-2" [class.bg-secondary-subtle]="filterType === 'กล่องขาด'">
+          <div class="card-body text-center">
+            <div class="small fw-bold text-dark mb-1">กล่องขาด</div>
+            <div class="h5 mb-0 fw-bold text-dark">{{ getCountByType('กล่องขาด') }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3 mb-3" (click)="selectFilterType('เสื้อเปื้อน')" style="cursor: pointer;">
+        <div class="card border-0 border-start border-info border-4 shadow-sm h-100 py-2" [class.bg-info-subtle]="filterType === 'เสื้อเปื้อน'">
+          <div class="card-body text-center">
+            <div class="small fw-bold text-info mb-1">เสื้อเปื้อน</div>
+            <div class="h5 mb-0 fw-bold text-dark">{{ getCountByType('เสื้อเปื้อน') }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="card shadow-sm border-0 mb-4">
-      <div class="card-body">
-        <div class="row g-3">
-          <div class="col-md-8">
-            <label class="form-label small fw-bold text-muted">Search ASN No.</label>
+      <div class="card-body py-3">
+        <div class="row align-items-center">
+          <div class="col-md-10">
             <div class="input-group">
               <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
-              <input type="text" class="form-control border-start-0" 
-                     placeholder="Type ASN number to search..." 
-                     [(ngModel)]="searchTerm" (input)="applyFilter()">
+              <input type="text" class="form-control border-start-0" placeholder="พิมพ์เลข ASN เพื่อค้นหา..." [(ngModel)]="searchTerm" (input)="applyFilter()">
             </div>
           </div>
-          <div class="col-md-4">
-            <label class="form-label small fw-bold text-muted">Filter Issue Type</label>
-            <select class="form-select" [(ngModel)]="filterType" (change)="applyFilter()">
-              <option value="">All Types</option>
-              <option value="กล่องบุบ">กล่องบุบ</option>
-              <option value="กล่องเป็นรอย">กล่องเป็นรอย</option>
-              <option value="กล่องขาด">กล่องขาด</option>
-              <option value="เสื้อเปื้อน">เสื้อเปื้อน</option>
-            </select>
+          <div class="col-md-2 text-end">
+            @if (filterType || searchTerm) {
+              <button class="btn btn-sm btn-link text-decoration-none text-muted" (click)="searchTerm=''; filterType=''; applyFilter()">
+                <i class="bi bi-x-circle"></i> ล้างการกรอง
+              </button>
+            }
           </div>
         </div>
       </div>
@@ -64,7 +105,9 @@
 
     <div class="card shadow-sm border-0">
       <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-        <h6 class="m-0 font-weight-bold text-primary">Detailed Damaged Logs</h6>
+        <h6 class="m-0 font-weight-bold text-primary">Detailed Damaged Logs 
+          <span class="badge bg-light text-primary border ms-2" *ngIf="filterType">{{ filterType }}</span>
+        </h6>
         <button class="btn btn-sm btn-outline-success shadow-sm" (click)="exportToExcel()">
           <i class="bi bi-file-earmark-excel"></i> Export Excel
         </button>
@@ -72,55 +115,125 @@
       
       <div class="card-body p-0">
         <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0">
+          <table class="table table-hover align-middle mb-0" style="font-size: 0.9rem;">
             <thead class="table-light text-secondary">
               <tr>
-                <th class="ps-3">Date</th>
-                <th>ASN / PO</th>
-                <th>Item Information</th>
-                <th>Carton No.</th>
-                <th>Issue Type</th>
-                <th class="text-center">Qty</th>
-                <th>Reporter</th>
+                <th class="ps-3">NO</th>
+                <th>DATE</th>
+                <th>ASN NO.</th>
+                <th>REF.PO / DOC</th>
+                <th>CARTON NO.</th>
+                <th>OF</th>
+                <th>ISSUE TYPE</th>
+                <th>PIC CARTON</th>
+                <th>SCAN CARTON</th>
+                <th>PIC SKU</th>
+                <th>PIC SKU 2</th>
+                <th>BARCODE</th>
+                <th class="text-end pe-4">EDIT</th>
               </tr>
             </thead>
             <tbody>
               @for (item of filteredBoxes; track item.id) {
                 <tr>
-                  <td class="ps-3">
-                    <div class="fw-bold">{{ item.created_at | date:'dd MMM yyyy' }}</div>
+                  <td class="ps-3 fw-bold">{{ item.id }}</td>
+                  <td>
+                    <div class="fw-bold text-nowrap">{{ item.created_at | date:'dd MMM yyyy' }}</div>
                     <small class="text-muted">{{ item.created_at | date:'HH:mm' }}</small>
                   </td>
                   <td>
-                    <span class="badge bg-light text-dark border">{{ item.asn_no }}</span>
-                    <div class="small text-muted mt-1">{{ item.ref_po_doc }}</div>
+                    @if (editingId === item.id) {
+                      <input type="text" class="form-control form-control-sm" [(ngModel)]="editForm.asn_no">
+                    } @else {
+                      <span class="badge bg-light text-dark border">{{ item.asn_no }}</span>
+                    }
                   </td>
                   <td>
-                    <div class="fw-bold text-primary">{{ item.item_sku }}</div>
-                    <code class="small text-muted">{{ item.barcode }}</code>
-                  </td>
-                  <td>{{ item.carton_no }}</td>
-                  <td>
-                    <span [class]="getIssueClass(item.issue_type)">
-                      {{ item.issue_type }}
-                    </span>
-                  </td>
-                  <td class="text-center">
-                    <span class="h6 mb-0 fw-bold">{{ item.qty }}</span>
+                    @if (editingId === item.id) {
+                      <input type="text" class="form-control form-control-sm" [(ngModel)]="editForm.ref_po_doc">
+                    } @else {
+                      <small>{{ item.ref_po_doc }}</small>
+                    }
                   </td>
                   <td>
-                    <div class="d-flex align-items-center">
-                      <div class="avatar-sm bg-secondary text-white rounded-circle me-2 d-flex justify-content-center align-items-center" 
-                           style="width: 28px; height: 28px; font-size: 11px;">
-                        {{ item.saved_by.substring(0,1).toUpperCase() }}
-                      </div>
-                      <span class="small">{{ item.saved_by }}</span>
-                    </div>
+                    @if (editingId === item.id) {
+                      <input type="text" class="form-control form-control-sm" [(ngModel)]="editForm.carton_no">
+                    } @else {
+                      {{ item.carton_no }}
+                    }
+                  </td>
+                  <td>
+                    @if (editingId === item.id) {
+                      <input type="text" class="form-control form-control-sm" [(ngModel)]="editForm.of_no">
+                    } @else {
+                      {{ item.of_no }}
+                    }
+                  </td>
+                  <td>
+                    @if (editingId === item.id) {
+                      <select class="form-select form-select-sm" [(ngModel)]="editForm.issue_type">
+                        <option value="กล่องบุบ">กล่องบุบ</option>
+                        <option value="กล่องเป็นรอย">กล่องเป็นรอย</option>
+                        <option value="กล่องขาด">กล่องขาด</option>
+                        <option value="เสื้อเปื้อน">เสื้อเปื้อน</option>
+                      </select>
+                    } @else {
+                      <span [class]="getIssueClass(item.issue_type)">{{ item.issue_type }}</span>
+                    }
+                  </td>
+                  <td>
+                    @if (item.carton_image) {
+                      <a [href]="item.carton_image" target="_blank">
+                        <img [src]="item.carton_image" class="rounded shadow-sm border" style="width: 50px; height: 50px; object-fit: cover;">
+                      </a>
+                    } @else { <span class="text-muted small">N/A</span> }
+                  </td>
+                  <td>
+                    @if (editingId === item.id) {
+                      <input type="text" class="form-control form-control-sm" [(ngModel)]="editForm.scan_carton">
+                    } @else {
+                      {{ item.scan_carton }}
+                    }
+                  </td>
+                  <td>
+                    @if (item.sku1_image) {
+                      <a [href]="item.sku1_image" target="_blank">
+                        <img [src]="item.sku1_image" class="rounded shadow-sm border" style="width: 50px; height: 50px; object-fit: cover;">
+                      </a>
+                    } @else { <span class="text-muted small">N/A</span> }
+                  </td>
+                  <td>
+                    @if (item.sku2_image) {
+                      <a [href]="item.sku2_image" target="_blank">
+                        <img [src]="item.sku2_image" class="rounded shadow-sm border" style="width: 50px; height: 50px; object-fit: cover;">
+                      </a>
+                    } @else { <span class="text-muted small">N/A</span> }
+                  </td>
+                  <td>
+                    @if (editingId === item.id) {
+                      <input type="text" class="form-control form-control-sm" [(ngModel)]="editForm.barcode">
+                    } @else {
+                      <code class="text-muted" style="font-size: 0.75rem;">{{ item.barcode }}</code>
+                    }
+                  </td>
+                  <td class="text-end pe-3">
+                    @if (editingId === item.id) {
+                      <button class="btn btn-sm btn-success me-1 shadow-sm d-inline-flex align-items-center" (click)="saveUpdate()">
+                        <i class="bi bi-check-lg me-1"></i> บันทึก
+                      </button>
+                      <button class="btn btn-sm btn-secondary shadow-sm d-inline-flex align-items-center" (click)="cancelEdit()">
+                        <i class="bi bi-x-lg me-1"></i> ยกเลิก
+                      </button>
+                    } @else {
+                      <button class="btn btn-sm btn-outline-primary border-0" (click)="startEdit(item)">
+                        <i class="bi bi-pencil-square me-1"></i> แก้ไข
+                      </button>
+                    }
                   </td>
                 </tr>
               } @empty {
                 <tr>
-                  <td colspan="7" class="text-center py-5">
+                  <td colspan="13" class="text-center py-5">
                     <i class="bi bi-inbox text-muted display-4"></i>
                     <p class="mt-2 text-muted">ไม่พบข้อมูลที่ตรงกับเงื่อนไขการค้นหา</p>
                   </td>
