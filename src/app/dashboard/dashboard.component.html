@@ -14,7 +14,7 @@
 
       <span class="badge rounded-pill bg-white text-muted border fw-normal py-1 px-3 shadow-sm" style="font-size: 0.75rem;">
         <i class="bi bi-clock-history me-1 text-primary"></i> 
-        ระบบอัปเดตข้อมูลอัตโนมัติทุก 1 นาที
+        ระบบอัปเดทอัติโนมัติทุกๆ 1 นาที
       </span>
     </div>
   </div>
@@ -143,10 +143,12 @@
                   </td>
                   <td>
                     @if (editingId === item.id) {
-                      <input type="text" class="form-control form-control-sm" [(ngModel)]="editForm.asn_no">
-                    } @else {
-                      <span class="badge bg-light text-dark border">{{ item.asn_no }}</span>
-                    }
+                  <input type="text" class="form-control form-control-sm" [(ngModel)]="editForm.asn_no">
+                  } @else {
+                 <span class="badge bg-light text-dark border">
+                 <span [innerHTML]="item.asn_no | highlight: searchTerm"></span>
+                  </span>
+                  }
                   </td>
                   <td>
                     @if (editingId === item.id) {

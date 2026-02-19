@@ -5,11 +5,12 @@ import { DamagedBoxService } from '../dashboard.service';
 import { DamagedBox } from '../damaged-box.model';
 import * as ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
+import { HighlightPipe } from './highlight.pipe';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, HighlightPipe],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
